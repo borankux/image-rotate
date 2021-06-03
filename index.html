@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Image Rotate</title>
+	<style>
+		.box {
+			margin: 10px auto;
+			width: 800px;
+			background-color: #eee;
+			min-height: 300px;
+			padding: 10px;
+		}
+
+		.title {
+			width: 100%;
+			text-align: center;
+		}
+
+		.preview {
+			position: relative;
+			width: 200px;
+			height: 200px;
+			margin: 0 auto;
+			background-color: white;
+		}
+
+
+		.preview img {
+			z-index: 1;
+			position: absolute;
+			display: block;
+			left:5%;
+			top:5%;
+			width: 90%;
+			height: 90%;
+		}
+
+		.preview .place-holder {
+			z-index: 2;
+			position: absolute;
+			text-align: center;
+			background-color: #ddd;
+			height: 100%;
+			width: 100%;
+			line-height: 200px;
+			border-radius: 5px;
+			border: 2px dashed gray;
+			cursor: pointer;
+		}
+
+		.chessboard {
+			background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUAQMAAAC3R49OAAAABlBMVEX////09PQtDxrOAAAAE0lEQVQI12P4f4CBKMxg/4EYDAAFkR1NiYvv7QAAAABJRU5ErkJggg==');
+			background-image: linear-gradient(45deg, #F0F0F0 25%, transparent 25%), linear-gradient(-45deg, #F0F0F0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #F0F0F0 75%), linear-gradient(-45deg, transparent 75%, #F0F0F0 75%);
+			background-size: 20px 20px;
+			background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+		}
+
+		.control {
+			width: 80%;
+			min-height: 90px;
+			margin: 20px auto;
+			text-align: center;
+		}
+
+		.control .btn{
+			border: 1px solid #ccc;
+			height: 50px;
+			border-radius: 50px;
+			width: 50px;
+			background-size: 60%;
+			background-position: center;
+			background-repeat: no-repeat;
+		}
+
+		.btn:hover {
+			box-shadow: 0 1px 6px 2px #ccc;
+		}
+
+		.btn:active {
+			box-shadow: 0 1px 6px 2px #ccc inset;
+		}
+
+		.control .btn-left {
+			background-image: url("rotate-left.png");
+		}
+
+		.control .btn-right {
+			background-image: url("rotate-right.png");
+		}
+
+		.control .btn-reset {
+			background-image: url("reset.png");
+		}
+
+		.canvas-holder {
+			position: relative;
+			width: 550px;
+			height: 550px;
+			margin: 10px auto;
+			background-color: white;
+			box-sizing: border-box;
+			padding-top: 25px;
+		}
+
+		.canvas {
+			display: block;
+			width: 500px;
+			height: 500px;
+			margin: 0 auto;
+			background-color: orange;
+			box-sizing: border-box;
+		}
+	</style>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+	<div class="box">
+		<h3 class="title">Image Rotate</h3>
+		<div class="preview">
+			<img alt="" class="preview chessboard">
+			<div class="place-holder" onselectstart="return false;">Click To Upload</div>
+		</div>
+		<div class="control">
+			<button class="btn btn-left"></button>
+			<button class="btn btn-reset"></button>
+			<button class="btn btn-right"></button>
+		</div>
+		<input type="file" class="fileInput" hidden>
+		<div class="canvas-holder">
+			<canvas class="canvas" id="canvas"></canvas>
+		</div>
+	</div>
+
+	<script>
+		$(document).ready(function(){
+			let reader = new FileReader();
+			let canvas = $("#canvas")[0];
+
+			let img = new Image();
+			let image = $("img.preview")[0];
+
+
+			$(".place-holder").click(function(){
+				$(".fileInput").click();
+			});
+
+			$(".btn-reset").click(function () {
+				$(".fileInput").val('');
+				$(".preview").removeAttr('src')
+				$(".place-holder").show();
+			});
+
+
+			reader.onloadstart = function(e){
+				console.log("started reading:" + e.loaded);
+			}
+
+			reader.onloadend = function (e) {
+				console.log("reading ended" + e.loaded);
+			}
+
+			reader.onload = function(e){
+				result = e.target.result;
+				$(".preview").attr("src", result);
+				$(".place-holder").hide();
+			}
+
+			$(".fileInput").change("change",function(e){
+				let file = this.files[0];
+				reader.readAsDataURL(file);
+			});
+
+			$(".btn-left").click(function () {
+				rotate(-90)
+			});
+
+			$(".btn-right").click(function (){
+				rotate(90);
+			});
+
+
+			function rotate(degree) {
+				img.src = image.src;
+				let ctx = canvas.getContext('2d');
+
+
+				//canvas.height = img.height;
+				//canvas.width = img.width;
+				console.log(img.width, img.height);
+				//ctx.translate(90 , 90)
+				ctx.rotate(Math.PI)
+				ctx.drawImage(img, img.width, img.height)
+				let url  = canvas.toDataURL('image/png')
+				image.src = url;
+			}
+		});
+	</script>
+</body>
+</html>
